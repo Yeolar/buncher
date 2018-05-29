@@ -73,13 +73,16 @@ def run(cmd, timer=False):
         print red('Cost: %.2fs' % (time.time() - t), True)
 
 
-def config(name):
-    try:
-        with open(rrfind_file(name)) as fp:
-            return to_object_dict(yaml.load(fp.read()))
-    except IOError:
-        print red('Missing conf: %s' % name, True)
-        sys.exit(1)
+def config(*names):
+    conf = {}
+    for name in names:
+        try:
+            with open(os.path.expanduser(name)) as fp:
+                conf.update(yaml.load(fp.read()))
+        except IOError:
+            print red('Missing conf: %s' % name, True)
+            sys.exit(1)
+    return to_object_dict(conf)
 
 
 def pretty_size(n):

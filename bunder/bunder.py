@@ -17,7 +17,7 @@ from .util import *
 
 PROG_NAME = 'bunder'
 
-conf = config('.bunder.yml')
+conf = config('~/.bunder.yml', '.bunder.yml')
 
 
 def basename(name):
@@ -30,9 +30,7 @@ def fullname(name, deb=False):
 class Handler(object):
 
     def __init__(self):
-        self.c = fabric.Connection(
-                conf.source.host,
-                connect_kwargs={'password': conf.source.password})
+        self.c = fabric.Connection(conf.source.host)
 
     def build_path(self, name):
         return os.path.join(conf.build.path, basename(name))
@@ -93,17 +91,20 @@ class DepRemoveHandler(Handler):
 
 def pkg_pack(names):
     handler = PkgPackHandler()
-    map(handler, names and names or handler.package(conf.project))
+    if not map(handler, names or handler.package(conf.project)):
+        print yellow('pack none package.')
 
 
 def dep_install(names):
     handler = DepInstallHandler()
-    map(handler, names and names or conf.depend)
+    if not map(handler, names or conf.depend or []):
+        print yellow('install none dep.')
 
 
 def dep_remove(names):
     handler = DepRemoveHandler()
-    map(handler, names and names or conf.depend)
+    if not map(handler, names or conf.depend or []):
+        print yellow('remove none dep.')
 
 
 def main():
