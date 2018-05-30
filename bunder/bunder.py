@@ -24,7 +24,10 @@ def basename(name):
     return name.split('-')[0]
 
 def fullname(name, deb=False):
-    return '%s-Linux' % name + (deb and '.deb' or '.tar.xz')
+    return '%s-%s%s' % (
+        name,
+        conf.arch or 'amd64',
+        deb and '.deb' or '.tar.xz')
 
 
 class Handler(object):
