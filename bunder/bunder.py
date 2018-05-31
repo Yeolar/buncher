@@ -82,13 +82,13 @@ class DepInstallHandler(Handler):
         self.c.local('tar xJf %s -C %s --strip-components=1' % (target, direct))
 
 
-class DepRemoveHandler(Handler):
+class DepDeleteHandler(Handler):
 
     def __init__(self):
         Handler.__init__(self)
 
     def __call__(self, dep):
-        print 'remove dep: %s' % dep
+        print 'delete dep: %s' % dep
         shutil.rmtree(self.build_path(dep))
 
 
@@ -104,10 +104,10 @@ def dep_install(names):
         print yellow('install none dep.')
 
 
-def dep_remove(names):
-    handler = DepRemoveHandler()
+def dep_delete(names):
+    handler = DepDeleteHandler()
     if not map(handler, names or conf.depend or []):
-        print yellow('remove none dep.')
+        print yellow('delete none dep.')
 
 
 def main():
@@ -124,7 +124,7 @@ def main():
     ag.add_argument('-i', '--dep-install',
                     action='store', nargs='*', metavar='dep',
                     help='initialize dependencies.')
-    ag.add_argument('-r', '--dep-remove',
+    ag.add_argument('-d', '--dep-delete',
                     action='store', nargs='*', metavar='dep',
                     help='clean dependencies.')
     ag = ap.add_argument_group('others')
@@ -139,8 +139,8 @@ def main():
     if args.dep_install is not None:
         dep_install(args.dep_install)
         return
-    if args.dep_remove is not None:
-        dep_remove(args.dep_remove)
+    if args.dep_delete is not None:
+        dep_delete(args.dep_delete)
         return
 
     ap.print_help()
