@@ -50,7 +50,7 @@ class Handler(object):
 
 class PkgPackHandler(Handler):
 
-    PACK_CMD = 'dpkg-scanpackages . | gzip - > Packages.gz'
+    PACK_CMD = 'dpkg-scanpackages -m . | gzip - > Packages.gz'
 
     def __init__(self):
         Handler.__init__(self)
