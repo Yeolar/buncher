@@ -7,6 +7,7 @@
 import fabric
 import json
 import os
+import subprocess
 import sys
 import time
 import yaml
@@ -68,7 +69,7 @@ def rrfind_file(name, level=2):
 def run(cmd, timer=False):
     print cyan(cmd, True)
     t = time.time()
-    os.system(cmd)
+    subprocess.call(cmd, shell=True)
     if timer:
         print red('Cost: %.2fs' % (time.time() - t), True)
 

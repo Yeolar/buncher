@@ -48,6 +48,24 @@ class Handler(object):
                    os.path.splitext(i)[1] in ('.deb', '.xz')]
 
 
+class PkgBuildHandler(Handler):
+
+    CMAKE_GEN_CMD = 'cmake -DCMAKE_TOOLCHAIN_FILE=../%s ..'
+
+    def __init__(self):
+        Handler.__init__(self)
+
+    def __call__(self, toolchain):
+        print 'build by: %s' % toolchain
+        self.c.local('rm -rf build && mkdir build')
+        dep_install([])
+        tc = 'cmake-scripts/%s-toolchain.cmake' % toolchain
+        if os.path.exists(tc):
+            run('cd build && ' + (self.CMAKE_GEN_CMD % tc))
+        else:
+            run('cd build && cmake ..')
+
+
 class PkgPackHandler(Handler):
 
     PACK_CMD = 'dpkg-scanpackages -m . | gzip - > Packages.gz'
@@ -92,6 +110,11 @@ class DepDeleteHandler(Handler):
         shutil.rmtree(self.build_path(dep))
 
 
+def pkg_build(name):
+    handler = PkgBuildHandler()
+    handler(name)
+
+
 def pkg_pack(names):
     handler = PkgPackHandler()
     if not map(handler, names or handler.package(conf.project)):
@@ -117,6 +140,9 @@ def main():
             epilog='Author: Yeolar <yeolar@gmail.com>',
             add_help=False)
     ag = ap.add_argument_group('package')
+    ag.add_argument('-b', '--build',
+                    action='store', nargs='?', metavar='toolchain', const='gcc',
+                    help='generate package build environment')
     ag.add_argument('-p', '--pack',
                     action='store', nargs='*', metavar='pkg',
                     help='pack package to deb host.')
@@ -133,6 +159,9 @@ def main():
                     help='show help')
     args = ap.parse_args()
 
+    if args.build is not None:
+        pkg_build(args.build)
+        return
     if args.pack is not None:
         pkg_pack(args.pack)
         return
