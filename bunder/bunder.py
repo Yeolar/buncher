@@ -55,10 +55,11 @@ class PkgBuildHandler(Handler):
     def __init__(self):
         Handler.__init__(self)
 
-    def __call__(self, toolchain):
+    def __call__(self, toolchain, cleaning=False):
         print 'build by: %s' % toolchain
-        self.c.local('rm -rf build && mkdir build')
-        dep_install([])
+        if cleaning:
+            self.c.local('rm -rf build && mkdir build')
+            dep_install([])
         tc = 'cmake-scripts/%s-toolchain.cmake' % toolchain
         if os.path.exists(tc):
             run('cd build && ' + (self.CMAKE_GEN_CMD % tc))
@@ -110,9 +111,9 @@ class DepDeleteHandler(Handler):
         shutil.rmtree(self.build_path(dep))
 
 
-def pkg_build(name):
+def pkg_build(name, cleaning=False):
     handler = PkgBuildHandler()
-    handler(name)
+    handler(name, cleaning)
 
 
 def pkg_pack(names):
@@ -139,13 +140,18 @@ def main():
             description='Bunder tool.',
             epilog='Author: Yeolar <yeolar@gmail.com>',
             add_help=False)
+
     ag = ap.add_argument_group('package')
     ag.add_argument('-b', '--build',
                     action='store', nargs='?', metavar='toolchain', const='gcc',
                     help='generate package build environment')
+    ag.add_argument('-c', '--clean',
+                    action='store_true', default=False,
+                    help='cleaning before generate')
     ag.add_argument('-p', '--pack',
                     action='store', nargs='*', metavar='pkg',
                     help='pack package to deb host.')
+
     ag = ap.add_argument_group('dependency')
     ag.add_argument('-i', '--dep-install',
                     action='store', nargs='*', metavar='dep',
@@ -153,14 +159,16 @@ def main():
     ag.add_argument('-d', '--dep-delete',
                     action='store', nargs='*', metavar='dep',
                     help='clean dependencies.')
+
     ag = ap.add_argument_group('others')
     ag.add_argument('-h', '--help',
                     action='store_true',
                     help='show help')
+
     args = ap.parse_args()
 
     if args.build is not None:
-        pkg_build(args.build)
+        pkg_build(args.build, args.clean)
         return
     if args.pack is not None:
         pkg_pack(args.pack)
