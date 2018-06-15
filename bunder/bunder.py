@@ -11,6 +11,7 @@ import os
 import shutil
 import sys
 
+from .stat import Stat
 from .transfer import Transfer
 from .util import *
 
@@ -83,6 +84,15 @@ class PkgPackHandler(Handler):
             self.c.run('cd %s && %s' % (direct, self.PACK_CMD))
 
 
+class PkgListHandler(Handler):
+
+    def __init__(self):
+        Handler.__init__(self)
+
+    def __call__(self):
+        Stat(self.c).listdir(conf.source.path)
+
+
 class DepInstallHandler(Handler):
 
     def __init__(self):
@@ -122,6 +132,11 @@ def pkg_pack(names):
         print yellow('pack none package.')
 
 
+def pkg_list():
+    handler = PkgListHandler()
+    handler()
+
+
 def dep_install(names):
     handler = DepInstallHandler()
     if not map(handler, names or conf.depend or []):
@@ -151,6 +166,9 @@ def main():
     ag.add_argument('-p', '--pack',
                     action='store', nargs='*', metavar='pkg',
                     help='pack package to deb host.')
+    ag.add_argument('-l', '--list',
+                    action='store_true', default=False,
+                    help='list package on deb host.')
 
     ag = ap.add_argument_group('dependency')
     ag.add_argument('-i', '--dep-install',
@@ -172,6 +190,9 @@ def main():
         return
     if args.pack is not None:
         pkg_pack(args.pack)
+        return
+    if args.list is not None:
+        pkg_list()
         return
     if args.dep_install is not None:
         dep_install(args.dep_install)
