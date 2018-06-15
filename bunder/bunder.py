@@ -11,7 +11,10 @@ import os
 import shutil
 import sys
 
-from .stat import Stat
+from collections import defaultdict
+from datetime import datetime
+from operator import attrgetter
+
 from .transfer import Transfer
 from .util import *
 
@@ -29,6 +32,13 @@ def fullname(name, deb=False):
         name,
         conf.arch or 'amd64',
         deb and '.deb' or '.tar.xz')
+
+def package_base(name):
+    base, _, __ = name.partition('-')
+    return base if _ else ''
+
+def package_version(name):
+    return name.split('-')[1]
 
 
 class Handler(object):
@@ -86,11 +96,26 @@ class PkgPackHandler(Handler):
 
 class PkgListHandler(Handler):
 
+    TYPE_MAP = { '.deb': 'DEB', '.xz': 'TXZ', }
+
     def __init__(self):
         Handler.__init__(self)
 
     def __call__(self):
-        Stat(self.c).listdir(conf.source.path)
+        files = self.c.sftp().listdir_attr(conf.source.path)
+        d = defaultdict(list)
+        for f in files:
+            base = package_base(f.filename)
+            if base:
+                d[base].append(f)
+        for k in sorted(d.keys()):
+            print k
+            for f in sorted(d[k], key=attrgetter('filename'), reverse=True):
+                print ' ',
+                print package_version(f.filename),
+                print self.TYPE_MAP[os.path.splitext(f.filename)[1]],
+                print '%5dK' % (f.st_size / 1024),
+                print datetime.fromtimestamp(f.st_mtime)
 
 
 class DepInstallHandler(Handler):
