@@ -49,6 +49,9 @@ class Handler(object):
     def build_path(self, name):
         return os.path.join(conf.build.path, basename(name))
 
+    def deps_path(self, name):
+        return os.path.join(conf.build.path + '-deps', basename(name))
+
     def remote_path(self, name):
         return os.path.join(conf.source.path, fullname(name))
 
@@ -70,7 +73,7 @@ class PkgBuildHandler(Handler):
         print 'build by: %s' % toolchain
         if cleaning:
             self.c.local('rm -rf build && mkdir build')
-            dep_install([])
+            #dep_install([])
         tc = 'cmake-scripts/%s-toolchain.cmake' % toolchain
         if os.path.exists(tc):
             run('cd build && ' + (self.CMAKE_GEN_CMD % tc))
@@ -125,8 +128,8 @@ class DepInstallHandler(Handler):
 
     def __call__(self, dep):
         print 'install dep: %s' % dep
-        direct = os.path.join(self.build_path(dep), basename(dep))
-        target = os.path.join(self.build_path(dep), fullname(dep))
+        direct = os.path.join(self.deps_path(dep), basename(dep))
+        target = os.path.join(self.deps_path(dep), fullname(dep))
         if os.path.exists(target):
             print '  already installed.'
             return
@@ -143,7 +146,7 @@ class DepDeleteHandler(Handler):
 
     def __call__(self, dep):
         print 'delete dep: %s' % dep
-        shutil.rmtree(self.build_path(dep))
+        shutil.rmtree(self.deps_path(dep))
 
 
 def pkg_build(name, cleaning=False):
