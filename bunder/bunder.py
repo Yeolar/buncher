@@ -191,7 +191,7 @@ def main():
     if args.pack is not None:
         pkg_pack(args.pack)
         return
-    if args.list is not None:
+    if args.list:
         pkg_list()
         return
     if args.dep_install is not None:
