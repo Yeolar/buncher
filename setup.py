@@ -9,7 +9,7 @@ from setuptools import setup, find_packages
 
 setup(
     name='bunder',
-    version='0.1',
+    version='0.2',
     description='A pack and deploy tool.',
     long_description=open('README.md').read(),
     license='Apache 2.0',

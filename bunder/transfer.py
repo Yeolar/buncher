@@ -19,9 +19,9 @@ class Transfer(object):
 
         # Massage remote path
         if not remote:
-            raise ValueError("Remote path must not be empty!")
+            raise ValueError('Remote path must not be empty!')
         orig_remote = remote
-        remote = posixpath.join(sftp.getcwd() or sftp.normalize("."), remote)
+        remote = posixpath.join(sftp.getcwd() or sftp.normalize('.'), remote)
 
         # Massage local path:
         orig_local = local
@@ -50,14 +50,14 @@ class Transfer(object):
         sftp = self.connection.sftp()
 
         if not local:
-            raise ValueError("Local path must not be empty!")
+            raise ValueError('Local path must not be empty!')
 
         # Massage remote path
         orig_remote = remote
         if not remote:
             remote = os.path.basename(local)
         prejoined_remote = remote
-        remote = posixpath.join(sftp.getcwd() or sftp.normalize("."), remote)
+        remote = posixpath.join(sftp.getcwd() or sftp.normalize('.'), remote)
 
         # Massage local path
         orig_local = local

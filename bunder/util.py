@@ -4,7 +4,6 @@
 # Copyright 2018 Yeolar
 #
 
-import fabric
 import json
 import os
 import subprocess
