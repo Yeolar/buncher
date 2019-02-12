@@ -31,17 +31,22 @@ bunder
 
 编译：
 
+```
   -g [toolchain], --gen [toolchain]     生成编译环境
   -b [job], --build [job]               编译
   -c, --clean                           清理编译临时目录
+```
 
 打包：
 
+```
   -p [pkg ...], --pack [pkg ...]        打包到远程主机
   -l, --list                            列出在远程主机的包
+```
 
 依赖：
 
+```
   -i [dep ...], --dep-install [dep ...] 安装依赖
   -d [dep ...], --dep-delete [dep ...]  清理依赖
-
+```
